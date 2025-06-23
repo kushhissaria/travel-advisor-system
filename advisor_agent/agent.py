@@ -1,6 +1,7 @@
-from google.adk.agents import Agent, AgentTool, SubAgent  
-from google.adk.tools import google_search  
-
+from google.adk.agents import Agent  
+from google.adk.tools import google_search,agent_tool  
+from advisor_agent.sub_agents.travel_agent.agent import travel_agent
+from advisor_agent.sub_agents.accommodation_agent.agent import accommodation_agent
 root_agent = Agent(
     name="advisor_agent",
     model="gemini-2.0-flash",
@@ -32,16 +33,36 @@ Tone:
 - Friendly, intelligent, and organized.
 - Be the brain coordinating the experience — the user should feel guided and understood at every step.
 """,
+    sub_agents=[accommodation_agent],
     tools=[
-        AgentTool(
-            name="TravelAgent",
-            description="Generates and validates travel recommendations before returning results."
-        )
-    ],
-    sub_agents=[
-        SubAgent(
-            name="AccommodationAgent",
-            description="Books accommodations at selected destinations after validation."
+        agent_tool.AgentTool(
+            travel_agent
         )
     ]
 )
+#from google.adk.agents import Agent
+#from advisor_agent.sub_agents.travel_planner.agent import travel_agent
+#from advisor_agent.sub_agents.accommodation_agent.agent import accommodation_agent
+#
+## This function decides where to send the input
+#async def route_user_query(user_input: str):
+#    user_input = user_input.lower()
+#    if "hotel" in user_input or "stay" in user_input or "accommodation" in user_input:
+#        return await accommodation_agent.run(user_input)
+#    else:
+#        return await travel_agent.run(user_input)
+#
+## Create the root agent
+#root_agent = Agent(
+#    name="advisor_agent",
+#    model="gemini-2.0-flash",
+#    description="Root agent coordinating travel and accommodation planning.",
+#    instruction="""
+#You help users plan trips and book stays. If the query is about travel, delegate to the Travel Agent.
+#If it’s about places to stay or hotels, delegate to the Accommodation Agent.
+#Always return meaningful responses to the user.
+#"""
+#)
+#
+## Override the default behavior
+#root_agent.run = route_user_query
